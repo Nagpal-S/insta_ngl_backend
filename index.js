@@ -6,11 +6,13 @@ const { Server } = require("socket.io");
 const userRoutes = require("./routes/userRoutes");
 const swaggerSetup = require("./config/swagger");
 const path = require("path");
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
 
 // -------------------- Middleware --------------------
+app.use(cors());
 app.use(bodyParser.json());
 app.use("/api/users", userRoutes);
 swaggerSetup(app);
