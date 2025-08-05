@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 const { Server } = require("socket.io");
 const userRoutes = require("./routes/userRoutes");
+const compatibilityRoutes = require("./routes/compatibilityRoutes");
 const swaggerSetup = require("./config/swagger");
 const path = require("path");
 const cors = require('cors');
@@ -15,6 +16,7 @@ const server = http.createServer(app);
 app.use(cors());
 app.use(bodyParser.json());
 app.use("/api/users", userRoutes);
+app.use("/api/compatibility", compatibilityRoutes);
 swaggerSetup(app);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 

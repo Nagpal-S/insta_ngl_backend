@@ -11,7 +11,7 @@ const options = {
             description: "API documentation for my Node.js app",
         },
         servers: [{
-            url: "http://192.168.1.6:3000",
+            url: "http://localhost:3000",
             description: "Local server",
         }, ],
     },
