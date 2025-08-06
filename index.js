@@ -5,6 +5,7 @@ require("dotenv").config();
 const { Server } = require("socket.io");
 const userRoutes = require("./routes/userRoutes");
 const compatibilityRoutes = require("./routes/compatibilityRoutes");
+const anonymousRoutes = require("./routes/anonymousRoutes");
 const swaggerSetup = require("./config/swagger");
 const path = require("path");
 const cors = require('cors');
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use("/api/users", userRoutes);
 app.use("/api/compatibility", compatibilityRoutes);
+app.use("/api/anonymous", anonymousRoutes);
 swaggerSetup(app);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
