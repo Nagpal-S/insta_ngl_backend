@@ -7,6 +7,7 @@ const userRoutes = require("./routes/userRoutes");
 const compatibilityRoutes = require("./routes/compatibilityRoutes");
 const anonymousRoutes = require("./routes/anonymousRoutes");
 const swipeGameRoutes = require("./routes/swipeGameRoutes");
+const truthnDareRoutes = require("./routes/truthnDareRoutes");
 const swaggerSetup = require("./config/swagger");
 const path = require("path");
 const cors = require('cors');
@@ -21,6 +22,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/compatibility", compatibilityRoutes);
 app.use("/api/anonymous", anonymousRoutes);
 app.use("/api/swipe-game", swipeGameRoutes);
+app.use("/api/truth-n-dare", truthnDareRoutes);
 swaggerSetup(app);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
