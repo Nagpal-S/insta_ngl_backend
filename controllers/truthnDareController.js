@@ -4,12 +4,12 @@ const truthnDare = require("../models/truthnDareModel");
 const { successResponse, errorResponse } = require("../utils/responseHelper");
 const e = require("express");
 
-exports.getTruthOrDareTemplate = async (req, res) => {
+exports.getTruthOrDareTemplate = async(req, res) => {
 
     try {
 
         const templates = await truthnDare.getTemplates()
-        if(!templates || templates.length == 0){
+        if (!templates || templates.length == 0) {
 
             errorResponse(res, "No templates found", 200)
 
@@ -25,7 +25,7 @@ exports.getTruthOrDareTemplate = async (req, res) => {
 
 };
 
-exports.createTruthnDareGame = async (req, res) => {
+exports.createTruthnDareGame = async(req, res) => {
 
     try {
 
@@ -36,10 +36,12 @@ exports.createTruthnDareGame = async (req, res) => {
             return errorResponse(res, "Title is required", 400);
         }
 
+        const user_id = req.userInfo.id
+
         const game_link = `quiz_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
         // Assuming you have a function to create a game in your model
-        const newGame = await truthnDare.createGame(title, game_link);
+        const newGame = await truthnDare.createGame(title, game_link, user_id);
         if (!newGame) {
             return errorResponse(res, "Failed to create game", 500);
         }
@@ -47,12 +49,12 @@ exports.createTruthnDareGame = async (req, res) => {
     } catch (error) {
 
         errorResponse(res, "Error creating game: " + error.message, 500);
-        
+
     }
 
 }
 
-exports.getListOfMygames = async (req, res) => {
+exports.getListOfMygames = async(req, res) => {
     try {
         const userId = req.userInfo.id; // Get user ID from the request
         const games = await truthnDare.getGamesByUserId(userId);
@@ -65,7 +67,7 @@ exports.getListOfMygames = async (req, res) => {
     }
 };
 
-exports.getGameResponses = async (req, res) => {
+exports.getGameResponses = async(req, res) => {
     try {
         const gameId = req.params.gameId; // Get game ID from the request parameters
         const responses = await truthnDare.getResponsesByGameId(gameId);
@@ -78,7 +80,7 @@ exports.getGameResponses = async (req, res) => {
     }
 };
 
-exports.playGame = async (req, res) => {
+exports.playGame = async(req, res) => {
     try {
         const { response, gameId, user } = req.body; // Get response from the request body
 
@@ -86,18 +88,25 @@ exports.playGame = async (req, res) => {
             return errorResponse(res, "Response is required", 400);
         }
 
-        const result = await truthnDare.playGame(gameId, user, response);
+        const game = await truthnDare.getGameDetailsByGameCode(gameId)
+        if (!game) {
+
+            return errorResponse(res, "Game not found", 300)
+
+        }
+
+        const result = await truthnDare.playGame(game.id, user, response);
         if (!result) {
             return errorResponse(res, "Failed to play game", 500);
         }
 
-        successResponse(res, "Game played successfully", {played: true});
+        successResponse(res, "Game played successfully", { played: true });
     } catch (error) {
         errorResponse(res, "Error playing game: " + error.message, 500);
     }
 };
 
-exports.getGameDetailsByGameCode = async (req, res) => {
+exports.getGameDetailsByGameCode = async(req, res) => {
     try {
         const gameCode = req.params.gameCode; // Get game code from the request parameters
         const gameDetails = await truthnDare.getGameDetailsByGameCode(gameCode);

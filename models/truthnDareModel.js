@@ -34,12 +34,12 @@ const TruthnDareGame = {
         const [rows] = await db.query(query);
         return rows;
     },
-    createGame: async (title, gameLink) => {
+    createGame: async (title, gameLink, user_id) => {
         const query = `
-            INSERT INTO truth_n_dare_games (title, active, no_of_responses, game_link)
-            VALUES (?, '1', 0, ?)
+            INSERT INTO truth_n_dare_games (title, active, no_of_responses, game_link, user_id)
+            VALUES (?, '1', 0, ?, ?)
         `;
-        const [result] = await db.query(query, [title, gameLink]);
+        const [result] = await db.query(query, [title, gameLink, user_id]);
         if (result.affectedRows > 0) {
             return result.insertId;
         }
