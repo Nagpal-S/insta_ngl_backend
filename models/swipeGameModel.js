@@ -1,7 +1,7 @@
 const db = require("../config/db");
 
 const SwipeGame = {
-    getQuestions: async () => {
+    getQuestions: async() => {
         const query = `
             SELECT sgq.id, sgq.question, sgq.icon
             FROM swipe_game_questions_template sgq
@@ -10,7 +10,7 @@ const SwipeGame = {
         const [rows] = await db.query(query);
         return rows;
     },
-    createGame: async (userId, gameCode, title) => {
+    createGame: async(userId, gameCode, title) => {
         const query = `
             INSERT INTO swipe_game (user_id, active, no_of_responses, game_code, title)
             VALUES (?, '1', 0, ?, ?)
@@ -18,7 +18,7 @@ const SwipeGame = {
         const [result] = await db.query(query, [userId, gameCode, title]);
         return result.insertId; // Return the ID of the newly created game
     },
-    setQuestion: async (question, gameId) => {
+    setQuestion: async(question, gameId) => {
         const query = `
             INSERT INTO swipe_game_questions (question, game_id, left_swipe_count, right_swipe_count)
             VALUES (?, ?, 0, 0)
@@ -26,7 +26,7 @@ const SwipeGame = {
         const [result] = await db.query(query, [question, gameId]);
         return result;
     },
-    getGameByCode: async (gameCode) => {
+    getGameByCode: async(gameCode) => {
         const query = `
             SELECT *
             FROM swipe_game
@@ -35,7 +35,7 @@ const SwipeGame = {
         const [rows] = await db.query(query, [gameCode]);
         return rows[0]; // Return the first game found
     },
-    getQuestionsByGameId: async (gameId) => {
+    getQuestionsByGameId: async(gameId) => {
         const query = `
             SELECT sgq.id, sgq.question
             FROM swipe_game_questions sgq
@@ -44,7 +44,7 @@ const SwipeGame = {
         const [rows] = await db.query(query, [gameId]);
         return rows;
     },
-    handleSwipe: async (game_code, questionsList, user) => {
+    handleSwipe: async(game_code, questionsList, user) => {
         // Process each question swipe
 
         // insert swipe_game_questions_result_details user, total_left, total_right, game_id
@@ -112,7 +112,7 @@ const SwipeGame = {
         return true;
 
     },
-    getGamesByUserId: async (userId) => {
+    getGamesByUserId: async(userId) => {
         const query = `
             SELECT id, title, game_code, no_of_responses, created
             FROM swipe_game
@@ -121,7 +121,7 @@ const SwipeGame = {
         const [rows] = await db.query(query, [userId]);
         return rows;
     },
-    getGameInfoById: async (gameId) => {
+    getGameInfoById: async(gameId) => {
         const query = `
             SELECT id, question, left_swipe_count, right_swipe_count
             FROM swipe_game_questions
@@ -130,7 +130,7 @@ const SwipeGame = {
         const [rows] = await db.query(query, [gameId]);
         return rows;
     },
-    getTopRightSwipe: async (gameId) => {
+    getTopRightSwipe: async(gameId) => {
         const query = `
             SELECT user, total_left, total_right
             FROM swipe_game_questions_result_details
@@ -139,6 +139,42 @@ const SwipeGame = {
             LIMIT 3
         `;
         const [rows] = await db.query(query, [gameId]);
+        return rows;
+    },
+    getTotalGamesCountByUser: async(userId) => {
+        const query = `
+            SELECT COUNT(*) as total_games
+            FROM swipe_game
+            WHERE user_id = ?
+        `;
+        const [rows] = await db.query(query, [userId]);
+        return rows[0].total_games;
+    },
+    getTotalResponsesCountByUser: async(userId) => {
+        const query = `
+            SELECT SUM(no_of_responses) as total_responses
+            FROM swipe_game
+            WHERE user_id = ?
+        `;
+        const [rows] = await db.query(query, [userId]);
+        return rows[0].total_responses;
+    },
+    getTodaysActiveGamesCountByUser: async(userId) => {
+        const query = `
+            SELECT COUNT(*) as total_games
+            FROM swipe_game
+            WHERE user_id = ? AND DATE(created) = CURDATE()
+        `;
+        const [rows] = await db.query(query, [userId]);
+        return rows[0].total_games;
+    },
+    getTodaysActiveGamesByUser: async(userId) => {
+        const query = `
+            SELECT id, title, game_code, no_of_responses, created
+            FROM swipe_game
+            WHERE user_id = ? AND DATE(created) = CURDATE() AND active = '1'
+        `;
+        const [rows] = await db.query(query, [userId]);
         return rows;
     }
 };

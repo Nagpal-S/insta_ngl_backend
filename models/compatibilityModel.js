@@ -1,11 +1,11 @@
 const db = require("../config/db");
 
 const Compatibility = {
-    findByEmail: async (email) => {
+    findByEmail: async(email) => {
         const [rows] = await db.query("SELECT users.* FROM users WHERE email = ?", [email]);
         return rows[0];
     },
-    getTemplates: async () => {
+    getTemplates: async() => {
         const query = `
             SELECT ct.id, ct.title, ct.description, ct.icon
             FROM compatibility_templates ct
@@ -14,7 +14,7 @@ const Compatibility = {
         const [rows] = await db.query(query);
         return rows;
     },
-    getQuestionsCategories: async () => {
+    getQuestionsCategories: async() => {
         const query = `
             SELECT cqc.id, cqc.title
             FROM compatibility_questions_category cqc
@@ -23,7 +23,7 @@ const Compatibility = {
         const [rows] = await db.query(query);
         return rows;
     },
-    getQuestions: async () => {
+    getQuestions: async() => {
         const query = `
             SELECT cq.id, cq.question, cq.category_id, cqc.title AS category_title, answer_a, answer_b, answer_c, answer_d
             FROM compatibility_questions cq
@@ -33,7 +33,7 @@ const Compatibility = {
         const [rows] = await db.query(query);
         return rows;
     },
-    createQuestion: async (data) => {
+    createQuestion: async(data) => {
         const query = `
             INSERT INTO compatibility_questions_quiz (question, category_id, answer_a, answer_b, answer_c, answer_d, correct_option, quiz_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -53,7 +53,7 @@ const Compatibility = {
         const [result] = await db.query(query, params);
         return result;
     },
-    createQuiz: async (data) => {
+    createQuiz: async(data) => {
         const query = `
             INSERT INTO compatibility_questions_quiz_details (user_id, title, description, quiz_code, active)
             VALUES (?, ?, ?, ?, ?)
@@ -68,7 +68,7 @@ const Compatibility = {
         const [result] = await db.query(query, params);
         return result;
     },
-    getQuizByCode: async (quizCode) => {
+    getQuizByCode: async(quizCode) => {
         const query = `
             SELECT cq.id, cq.title, cq.description, cq.quiz_code, cq.active, cq.no_of_responses, cq.created 
             FROM compatibility_questions_quiz_details cq
@@ -77,7 +77,7 @@ const Compatibility = {
         const [rows] = await db.query(query, [quizCode]);
         return rows[0];
     },
-    getQuestionsByQuizId: async (quizId) => {
+    getQuestionsByQuizId: async(quizId) => {
         const query = `
             SELECT cq.id, cq.question, cq.category_id, cqc.title AS category_title, answer_a, answer_b, answer_c, answer_d, correct_option
             FROM compatibility_questions_quiz cq
@@ -87,7 +87,7 @@ const Compatibility = {
         const [rows] = await db.query(query, [quizId]);
         return rows;
     },
-    getQuestionById: async (questionId) => {
+    getQuestionById: async(questionId) => {
         const query = `
             SELECT cq.id, cq.question, cq.category_id, cqc.title AS category_title, answer_a, answer_b, answer_c, answer_d, correct_option
             FROM compatibility_questions_quiz cq
@@ -97,7 +97,7 @@ const Compatibility = {
         const [rows] = await db.query(query, [questionId]);
         return rows[0];
     },
-    calculateScore: async (answers, user, quizId) => {
+    calculateScore: async(answers, user, quizId) => {
 
 
         // store user info in compatibility_questions_quiz_result_details
@@ -151,7 +151,7 @@ const Compatibility = {
 
         return score;
     },
-    getTopQuizResults: async (quizId) => {
+    getTopQuizResults: async(quizId) => {
         const query = `
             SELECT cr.user, cr.quiz_total, cr.id
             FROM  compatibility_questions_quiz_result_details cr 
@@ -159,11 +159,11 @@ const Compatibility = {
             Order by cr.quiz_total DESC
             limit 3
         `;
-        
+
         const [rows] = await db.query(query, [quizId]);
         return rows;
     },
-    getAllQuizResults: async (quizId) => {
+    getAllQuizResults: async(quizId) => {
         const query = `
             SELECT cr.user, cr.quiz_total, cr.id
             FROM  compatibility_questions_quiz_result_details cr
@@ -173,7 +173,7 @@ const Compatibility = {
         const [rows] = await db.query(query, [quizId]);
         return rows;
     },
-    getAllQuizzes: async (userId) => {
+    getAllQuizzes: async(userId) => {
         const query = `
             SELECT cq.id, cq.title, cq.description, cq.quiz_code, cq.active, cq.no_of_responses, cq.created
             FROM compatibility_questions_quiz_details cq
@@ -182,7 +182,7 @@ const Compatibility = {
         const [rows] = await db.query(query, [userId]);
         return rows;
     },
-    getQuizResultByUser: async (quizId, user) => {
+    getQuizResultByUser: async(quizId, user) => {
         const query = `
             SELECT cr.id, cr.quiz_total, cr.created
             FROM compatibility_questions_quiz_result_details cr
@@ -192,7 +192,7 @@ const Compatibility = {
         const [rows] = await db.query(query, [quizId, user]);
         return rows[0];
     },
-    getQuizResponseByUser: async (resultId) => {
+    getQuizResponseByUser: async(resultId) => {
 
         const query = `
             SELECT cr.id, cr.question_id, cr.answer, cr.correct_answer, cr.answer_type
@@ -200,6 +200,42 @@ const Compatibility = {
             WHERE cr.result_id = ?
         `;
         const [rows] = await db.query(query, [resultId]);
+        return rows;
+    },
+    getTotalGamesCountByUser: async(userId) => {
+        const query = `
+            SELECT COUNT(*) as total_games
+            FROM compatibility_questions_quiz_details
+            WHERE user_id = ?
+        `;
+        const [rows] = await db.query(query, [userId]);
+        return rows[0].total_games;
+    },
+    getTotalResponsesCountByUser: async(userId) => {
+        const query = `
+            SELECT SUM(no_of_responses) as total_responses
+            FROM compatibility_questions_quiz_details
+            WHERE user_id = ?
+        `;
+        const [rows] = await db.query(query, [userId]);
+        return rows[0].total_responses;
+    },
+    getTodaysActiveGamesCountByUser: async(userId) => {
+        const query = `
+            SELECT COUNT(*) as total_games
+            FROM compatibility_questions_quiz_details
+            WHERE user_id = ? AND DATE(created) = CURDATE()
+        `;
+        const [rows] = await db.query(query, [userId]);
+        return rows[0].total_games;
+    },
+    getTodaysActiveGamesByUser: async(userId) => {
+        const query = `
+            SELECT id, title, quiz_code, no_of_responses, created
+            FROM compatibility_questions_quiz_details
+            WHERE user_id = ? AND DATE(created) = CURDATE() AND active = '1'
+        `;
+        const [rows] = await db.query(query, [userId]);
         return rows;
     }
 };

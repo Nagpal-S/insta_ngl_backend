@@ -25,7 +25,7 @@ const db = require("../config/db");
  */
 
 const TruthnDareGame = {
-    getTemplates: async () => {
+    getTemplates: async() => {
         const query = `
             SELECT id, title
             FROM truth_n_dare_templates
@@ -34,7 +34,7 @@ const TruthnDareGame = {
         const [rows] = await db.query(query);
         return rows;
     },
-    createGame: async (title, gameLink, user_id) => {
+    createGame: async(title, gameLink, user_id) => {
         const query = `
             INSERT INTO truth_n_dare_games (title, active, no_of_responses, game_link, user_id)
             VALUES (?, '1', 0, ?, ?)
@@ -45,7 +45,7 @@ const TruthnDareGame = {
         }
         return null;
     },
-    getGamesByUserId: async (userId) => {
+    getGamesByUserId: async(userId) => {
         const query = `
             SELECT id, title, game_link, no_of_responses
             FROM truth_n_dare_games
@@ -54,7 +54,7 @@ const TruthnDareGame = {
         const [rows] = await db.query(query, [userId]);
         return rows;
     },
-    getResponsesByGameId: async (gameId) => {
+    getResponsesByGameId: async(gameId) => {
         const query = `
             SELECT id, user, response, created
             FROM truth_n_dare_games_responses
@@ -63,7 +63,7 @@ const TruthnDareGame = {
         const [rows] = await db.query(query, [gameId]);
         return rows;
     },
-    playGame: async (gameId, user, response) => {
+    playGame: async(gameId, user, response) => {
         const query = `
             INSERT INTO truth_n_dare_games_responses (game_id, user, response)
             VALUES (?, ?, ?)
@@ -80,7 +80,7 @@ const TruthnDareGame = {
 
         return result.affectedRows > 0;
     },
-    getGameDetailsByGameCode: async (gameCode) => {
+    getGameDetailsByGameCode: async(gameCode) => {
         const query = `
             SELECT id, title, game_link, no_of_responses
             FROM truth_n_dare_games
@@ -88,6 +88,42 @@ const TruthnDareGame = {
         `;
         const [rows] = await db.query(query, [gameCode]);
         return rows[0] || null;
+    },
+    getTotalGamesCountByUser: async(userId) => {
+        const query = `
+            SELECT COUNT(*) as total_games
+            FROM truth_n_dare_games
+            WHERE user_id = ?
+        `;
+        const [rows] = await db.query(query, [userId]);
+        return rows[0].total_games;
+    },
+    getTotalResponsesCountByUser: async(userId) => {
+        const query = `
+            SELECT SUM(no_of_responses) as total_responses
+            FROM truth_n_dare_games
+            WHERE user_id = ?
+        `;
+        const [rows] = await db.query(query, [userId]);
+        return rows[0].total_responses;
+    },
+    getTodaysActiveGamesCountByUser: async(userId) => {
+        const query = `
+            SELECT COUNT(*) as total_games
+            FROM truth_n_dare_games
+            WHERE user_id = ? AND DATE(created) = CURDATE()
+        `;
+        const [rows] = await db.query(query, [userId]);
+        return rows[0].total_games;
+    },
+    getTodaysActiveGamesByUser: async(userId) => {
+        const query = `
+            SELECT id, title, game_link, no_of_responses
+            FROM truth_n_dare_games
+            WHERE user_id = ? AND DATE(created) = CURDATE() AND active = '1'
+        `;
+        const [rows] = await db.query(query, [userId]);
+        return rows;
     }
 };
 // b master ice cream 
