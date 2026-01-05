@@ -97,7 +97,9 @@ const Anonymous = {
             SELECT anonymous_message.*, anonymous_message_templates.title, anonymous_message_templates.description
             FROM anonymous_message
             LEFT JOIN anonymous_message_templates ON anonymous_message.template_id = anonymous_message_templates.id
-            WHERE user_id = ? AND anonymous_message.active = '1' AND DATE(anonymous_message.created) = CURDATE()
+            WHERE user_id = ? AND anonymous_message.active = '1'
+            ORDER BY id DESC
+            LIMIT 5
         `;
         const [rows] = await db.query(query, [userId]);
         return rows;

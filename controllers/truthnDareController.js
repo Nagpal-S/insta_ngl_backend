@@ -82,7 +82,7 @@ exports.getGameResponses = async(req, res) => {
 
 exports.playGame = async(req, res) => {
     try {
-        const { response, gameId, user } = req.body; // Get response from the request body
+        const { response, gameId, user, type } = req.body; // Get response from the request body
 
         if (!response) {
             return errorResponse(res, "Response is required", 400);
@@ -95,7 +95,7 @@ exports.playGame = async(req, res) => {
 
         }
 
-        const result = await truthnDare.playGame(game.id, user, response);
+        const result = await truthnDare.playGame(game.id, user, response, type);
         if (!result) {
             return errorResponse(res, "Failed to play game", 500);
         }

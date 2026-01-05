@@ -56,19 +56,19 @@ const TruthnDareGame = {
     },
     getResponsesByGameId: async(gameId) => {
         const query = `
-            SELECT id, user, response, created
+            SELECT id, user, response, created, type
             FROM truth_n_dare_games_responses
             WHERE game_id = ?
         `;
         const [rows] = await db.query(query, [gameId]);
         return rows;
     },
-    playGame: async(gameId, user, response) => {
+    playGame: async(gameId, user, response, type) => {
         const query = `
-            INSERT INTO truth_n_dare_games_responses (game_id, user, response)
-            VALUES (?, ?, ?)
+            INSERT INTO truth_n_dare_games_responses (game_id, user, response, type)
+            VALUES (?, ?, ?, ?)
         `;
-        const [result] = await db.query(query, [gameId, user, response]);
+        const [result] = await db.query(query, [gameId, user, response, type]);
 
         // update no_of_responses
         const updateQuery = `
@@ -120,7 +120,9 @@ const TruthnDareGame = {
         const query = `
             SELECT id, title, game_link, no_of_responses
             FROM truth_n_dare_games
-            WHERE user_id = ? AND DATE(created) = CURDATE() AND active = '1'
+            WHERE user_id = ? AND active = '1'
+            ORDER BY id DESC
+            LIMIT 5
         `;
         const [rows] = await db.query(query, [userId]);
         return rows;

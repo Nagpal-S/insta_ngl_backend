@@ -233,7 +233,9 @@ const Compatibility = {
         const query = `
             SELECT id, title, quiz_code, no_of_responses, created
             FROM compatibility_questions_quiz_details
-            WHERE user_id = ? AND DATE(created) = CURDATE() AND active = '1'
+            WHERE user_id = ? AND active = '1'
+            ORDER BY id DESC
+            LIMIT 5
         `;
         const [rows] = await db.query(query, [userId]);
         return rows;

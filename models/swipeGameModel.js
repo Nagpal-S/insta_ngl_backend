@@ -172,7 +172,9 @@ const SwipeGame = {
         const query = `
             SELECT id, title, game_code, no_of_responses, created
             FROM swipe_game
-            WHERE user_id = ? AND DATE(created) = CURDATE() AND active = '1'
+            WHERE user_id = ? AND active = '1'
+            ORDER BY id DESC
+            LIMIT 5
         `;
         const [rows] = await db.query(query, [userId]);
         return rows;

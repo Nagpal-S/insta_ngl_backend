@@ -18,7 +18,7 @@ const router = express.Router();
  *       type: http
  *       scheme: bearer
  *       bearerFormat: JWT
-*/
+ */
 
 
 
@@ -196,6 +196,9 @@ router.get("/my-games", auth, getListOfMygames);
  *                       response:
  *                         type: string
  *                         example: "I dare you to sing a song!"
+ *                       type:
+ *                         type: string
+ *                         example: "DARE"
  *                       created:
  *                         type: string
  *                         format: date-time
@@ -211,8 +214,6 @@ router.get("/game-responses/:gameId", auth, getGameResponses);
  *     description: Submits a response for a specific truth n dare game
  *     tags:
  *       - Truth n Dare
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -221,14 +222,17 @@ router.get("/game-responses/:gameId", auth, getGameResponses);
  *             type: object
  *             properties:
  *               gameId:
- *                 type: integer
- *                 example: 1
+ *                 type: string
+ *                 example: "game_0001"
  *               user:
  *                 type: string
  *                 example: "User123"
  *               response:
  *                 type: string
  *                 example: "I dare you to sing a song!"
+ *               type:
+ *                 type: string
+ *                 example: "TRUTH"
  *     responses:
  *       200:
  *         description: Game played successfully
@@ -250,7 +254,7 @@ router.get("/game-responses/:gameId", auth, getGameResponses);
  *                       type: boolean
  *                       example: true
  */
-router.post("/play-game", auth, playGame);
+router.post("/play-game", playGame);
 
 /**
  * @swagger
